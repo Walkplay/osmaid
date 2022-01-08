@@ -1,0 +1,1 @@
+pipenv run py ./src/main.py %1 %~f2

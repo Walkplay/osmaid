@@ -1,0 +1,18 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OS-maid",
+            "type": "shell",
+            "command": ".\\autorun.sh",
+            "args": [
+                "-c", ".\\develop-eggs\\config.yaml"
+            ],
+            "options": {
+                "cwd": "D:\\repos\\osmaid\\"
+            }
+        }
+    ]
+}
