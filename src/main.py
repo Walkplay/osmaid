@@ -1,28 +1,73 @@
 import argparse
-from data import Config
-from data.CleanDate import CleanDate
-from domain.Evaluator import Evaluator
-from reader.YAMLReader import YAMLReader
+from datetime import datetime
+from data import *
+from domain import *
+from datetime import timedelta
+import os
 
 
-def main():
-    parser = argparse.ArgumentParser(description='OS-maid to clean your cache')
-    addArguments(parser)
-    args = parser.parse_args()
+def install(args):
+
+    writer = YAMLWriter()
+    extension = ".yml"
+    configFileName = "config"
+    reportFileName = "report"
+    print("Installing...")
+    session = ConfigItem(timedelta(days=0), ["session1"])
+    daily = ConfigItem(timedelta(days=1), ["daily1"])
+    weekly = ConfigItem(timedelta(days=7),["weekly1"])
+    monthly = ConfigItem(timedelta(days=30),["monthly1"])
+    config = Config([session, daily, weekly, monthly])
+
+    configPath = os.path.join(args.output, configFileName) + extension
+    writer.save(configPath, config)
+    print(f"Generate config file at: {configPath}")
+
+    report = Report(0, {})
+
+    reportPath = os.path.join(args.output, reportFileName) + extension
+    writer.save(reportPath, report)
+    print(f"Generate report file at: {reportPath}")
+
+
+def run(args):
     reader = YAMLReader()
-    text = reader.extract_text(args.configPath)
-    config = Config(**text)
-    text = reader.extract_text(args.dataPath)
-    date = CleanDate(**text)
-    evaluator = Evaluator()
-    folders = evaluator.evaluate(config, date)
-    print(folders)
+    writer = YAMLWriter()
+    config:Config = reader.extract_text(args.configIO)
+    report:Report = reader.extract_text(args.reportIO)
 
+    currentTime = datetime.now()
+    filter = Filter(currentTime)
+    evaluator = Evaluator(filter, config, report)
+    pathCollection = evaluator.evaluate()
 
-def addArguments(par: argparse.ArgumentParser):
-    par.add_argument("-c", dest="configPath", type=str)
-    par.add_argument("-d", dest="dataPath", type=str)
+    cleaner = Cleaner(pathCollection)
+    cleaner.clean()
+
+    report.update(pathCollection, currentTime.timestamp())
+
+    args.reportIO.seek(0)
+    writer.save(args.reportIO, report)
+
+    print(pathCollection)
+    pass
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(prog='OSMaid', description='OS-maid to clean your cache')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+    subparsers = parser.add_subparsers(help='sub-command help')
+
+    installParser = subparsers.add_parser('install', help='install help')
+    installParser.add_argument("-o", dest="output", help="Install folder")
+    installParser.set_defaults(func=install)
+
+    runParser = subparsers.add_parser('run', help='run help')
+    runParser.add_argument("-c", dest="configIO", type=argparse.FileType('r'))
+    runParser.add_argument("-r", dest="reportIO", type=argparse.FileType('r+'))
+    runParser.set_defaults(func=run)
+
+    args = parser.parse_args()
+    args.func(args)
+
+

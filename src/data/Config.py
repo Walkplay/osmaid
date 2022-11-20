@@ -1,8 +1,6 @@
 from dataclasses import dataclass
+from data.ConfigItem import ConfigItem
 
 @dataclass 
 class Config():
-    session : list
-    daily : list
-    weekly : list
-    monthly : list
+    items : list[ConfigItem]

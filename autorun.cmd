@@ -1,1 +1,1 @@
-pipenv run py ./src/main.py %1 %~f2
+pipenv run py ./src/main.py run -c %~f1 -r %~f2

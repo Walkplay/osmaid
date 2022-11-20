@@ -1,0 +1,1 @@
+pipenv run py -m unittest discover -s .\src\tests\ -t .\src\  -v
