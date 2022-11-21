@@ -8,11 +8,11 @@ class YAMLWriter():
         # yaml.add_representer(ConfigItem, self.configItem_representer)
 
 
-    def save(self, path: str, data: any) -> str:
+    def save_path(self, path: str, data: any):
         with open(path, 'w', encoding='utf8') as outfile:
-            self.save(outfile, data)
+            self.save_stream(outfile, data)
 
-    def save(self, stream: TextIOWrapper, data: any) -> str:
+    def save_stream(self, stream: TextIOWrapper, data: any):
             yaml.safe_dump(data, stream, default_flow_style=False, allow_unicode=True)
     
     # def get_dumper(self):

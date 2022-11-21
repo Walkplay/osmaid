@@ -1,0 +1,1 @@
+pipenv run py ./src/main.py run -c "%OS_MAID_CWD%\config.yml" -r "%OS_MAID_CWD%\report.yml"

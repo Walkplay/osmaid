@@ -13,6 +13,11 @@ def install(args):
     configFileName = "config"
     reportFileName = "report"
     print("Installing...")
+
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+        print("Create missing directory...")
+
     session = ConfigItem(timedelta(days=0), ["session1"])
     daily = ConfigItem(timedelta(days=1), ["daily1"])
     weekly = ConfigItem(timedelta(days=7),["weekly1"])
@@ -20,13 +25,13 @@ def install(args):
     config = Config([session, daily, weekly, monthly])
 
     configPath = os.path.join(args.output, configFileName) + extension
-    writer.save(configPath, config)
+    writer.save_path(configPath, config)
     print(f"Generate config file at: {configPath}")
 
     report = Report(0, {})
 
-    reportPath = os.path.join(args.output, reportFileName) + extension
-    writer.save(reportPath, report)
+    reportPath:str = os.path.join(args.output, reportFileName) + extension
+    writer.save_path(reportPath, report)
     print(f"Generate report file at: {reportPath}")
 
 
@@ -47,7 +52,7 @@ def run(args):
     report.update(pathCollection, currentTime.timestamp())
 
     args.reportIO.seek(0)
-    writer.save(args.reportIO, report)
+    writer.save_stream(args.reportIO, report)
 
     print(pathCollection)
     pass
